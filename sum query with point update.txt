@@ -1,0 +1,65 @@
+
+
+class segTree{      
+                    /*  How to
+                    //segTree st(0 , 5 , a); //initialise
+                    //st.rangeSum(2 , 2) //range sum query
+                    //st.pointUpdate(2 , 7); //point update
+                    */
+
+    public :
+    int leftMost , rightMost;
+    segTree *leftChild;
+    segTree *rightChild;
+    int sum;
+
+    segTree(int lm , int rm , vector<ll> a){
+        leftMost = lm;
+        rightMost = rm;
+        
+        if(leftMost == rightMost){ //leaf condition
+            sum = a[leftMost];
+        }else{
+            int mid = (leftMost + rightMost )/2;
+
+            leftChild = new segTree(leftMost , mid , a);
+            rightChild = new segTree(mid+1 , rightMost , a);
+            recalc();
+        }
+    }
+
+    void recalc(){
+        if(leftMost == rightMost){
+            return ;
+        }
+        sum = leftChild->sum + rightChild->sum;
+    }
+
+
+    void pointUpdate(int index , int newVal){
+        if(leftMost == rightMost){ //leaf condition
+            sum = newVal;
+            return ;
+        }
+        // two childs
+        if(index <= leftChild->rightMost )leftChild->pointUpdate(index , newVal);
+        else rightChild->pointUpdate(index , newVal);
+        recalc();
+    }
+
+
+    int rangeSum(int l , int r){
+        // entirely disjoint
+        if(l>rightMost || r<leftMost)return 0;
+
+        //cover us
+        if(l<=leftMost and r >=rightMost)return sum;
+
+        //case 3 we don't know
+        return leftChild->rangeSum(l,r) + rightChild->rangeSum(l,r);
+
+
+    }
+
+};
+
